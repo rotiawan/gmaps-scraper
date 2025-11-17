@@ -1,0 +1,149 @@
+2025-11-17 11:23:26 - INFO - 🔧 Setup Selenium WebDriver...
+2025-11-17 11:23:26 - INFO - ====== WebDriver manager ======
+2025-11-17 11:23:27 - INFO - Get LATEST chromedriver version for google-chrome
+2025-11-17 11:23:27 - INFO - Get LATEST chromedriver version for google-chrome
+2025-11-17 11:23:28 - INFO - Get LATEST chromedriver version for google-chrome
+2025-11-17 11:23:29 - INFO - WebDriver version 142.0.7444.162 selected
+2025-11-17 11:23:29 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.162/win32/chromedriver-win32.zip
+2025-11-17 11:23:29 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.162/win32/chromedriver-win32.zip
+2025-11-17 11:23:29 - INFO - Driver downloading response is 200
+2025-11-17 11:23:30 - INFO - Get LATEST chromedriver version for google-chrome
+2025-11-17 11:23:30 - INFO - Driver has been saved in cache [C:\Users\muham\.wdm\drivers\chromedriver\win64\142.0.7444.162]
+2025-11-17 11:23:33 - INFO - ✅ WebDriver berhasil di-setup
+2025-11-17 11:23:33 - INFO - 🔎 Mencari: 'travel agen umrah di jakarta'
+2025-11-17 11:23:39 - INFO - ✅ Pencarian berhasil
+2025-11-17 11:23:39 - INFO - 📜 Memulai scrolling untuk mengumpulkan link...
+2025-11-17 11:24:45 - INFO - Progress scroll: 5/100
+2025-11-17 11:25:50 - INFO - Progress scroll: 10/100
+2025-11-17 11:26:55 - INFO - Progress scroll: 15/100
+2025-11-17 11:28:00 - INFO - Progress scroll: 20/100
+2025-11-17 11:28:56 - INFO - ✅ Mencapai akhir daftar setelah 25 scroll
+2025-11-17 11:28:56 - INFO - 🔗 Mengumpulkan link hasil...
+2025-11-17 11:28:56 - INFO - ✅ Total 122 link unik ditemukan
+2025-11-17 11:28:56 - INFO - 💾 Membuka file output: results/travel_agen_umrah_di_jakarta_20251117_112856.csv
+2025-11-17 11:28:56 - INFO - 🔍 Validation Mode: MODERATE
+2025-11-17 11:28:56 - INFO - 📋 Required Fields: namaTravel, websiteUrl, email
+2025-11-17 11:29:12 - INFO - Scraping Progress [1/122] (0.8%) - ✅ PT Dream Tours & Travel | ✉️ info@dreamtour.co
+2025-11-17 11:30:07 - WARNING -    ⏭️  SKIP: Alsha Tour Travel - Missing: email
+2025-11-17 11:30:32 - INFO - Scraping Progress [2/122] (1.6%) - ✅ UMI Tour & Travel (Travel Umrah & H | ✉️ umrah@umi.travel
+2025-11-17 11:31:48 - WARNING -    ⏭️  SKIP: Travel Umroh Terbaik Jakarta - Missing: email
+2025-11-17 11:32:47 - WARNING -    ⏭️  SKIP: PT. Az-Zahra Tour & Travel (Umrah & - Missing: email
+2025-11-17 11:34:01 - WARNING -    ⏭️  SKIP: Maktour umroh & haji - Missing: email
+2025-11-17 11:34:18 - INFO - Scraping Progress [3/122] (2.5%) - ✅ Munatour Umroh dan Haji Services | ✉️ info@munatour.co.id
+2025-11-17 11:34:42 - WARNING -    ⏭️  SKIP: Nursa Group Travel Haji Umrah - Missing: websiteUrl, email
+2025-11-17 11:35:49 - WARNING -    ⏭️  SKIP: Almira Travel - Travel Haji ONH Plu - Missing: email
+2025-11-17 11:36:14 - INFO - Scraping Progress [4/122] (3.3%) - ✅ Khazzanah Tours & Travel | ✉️ cskhazzanahtours@gmail.com
+2025-11-17 11:36:39 - INFO - Scraping Progress [5/122] (4.1%) - ✅ Maghfirah Travel | Travel Haji dan  | ✉️ travel@maghfirahtravel.com
+2025-11-17 11:36:53 - INFO - Scraping Progress [6/122] (4.9%) - ✅ Smarts Umrah by DREAM GROUP (Travel | ✉️ info@smartsumrah.com
+2025-11-17 11:37:38 - WARNING -    ⏭️  SKIP: Sunna Travel | Umroh Sesuai Sunnah - Missing: email
+2025-11-17 11:37:55 - INFO - Scraping Progress [7/122] (5.7%) - ✅ PT Alhijaz Indowisata | ✉️ alhijaz_indowisata@hotmail.com
+2025-11-17 11:38:18 - WARNING -    ⏭️  SKIP: Hadira Haramain | Travel Umroh Terb - Missing: websiteUrl, email
+2025-11-17 11:38:34 - INFO - Scraping Progress [8/122] (6.6%) - ✅ Kautsar Motivatour Travel Umroh Ter | ✉️ kautsarmotivatour@gmail.com
+2025-11-17 11:39:09 - INFO - Scraping Progress [9/122] (7.4%) - ✅ Elmanaseek Umrah Haji Tour Travel P | ✉️ admin@elmanaseek.id
+2025-11-17 11:40:05 - WARNING -    ⏭️  SKIP: Ilfa Travel : Travel Haji & Umroh T - Missing: email
+2025-11-17 11:40:19 - WARNING -    ⏭️  SKIP: PT. Al'Muchtar Tour & Travel - Jaka - Missing: email
+2025-11-17 11:40:43 - WARNING -    ⏭️  SKIP: Rahmah Travel Umroh | PT. Rahmah Gr - Missing: websiteUrl, email
+2025-11-17 11:41:07 - INFO - Scraping Progress [10/122] (8.2%) - ✅ Alburaq United Travel Umroh | ✉️ support@gmail.com
+2025-11-17 11:41:24 - INFO - Scraping Progress [11/122] (9.0%) - ✅ Nakhla Tour | ✉️ hello@nakhla.id
+2025-11-17 11:41:45 - INFO - Scraping Progress [12/122] (9.8%) - ✅ MAQBULAH Kantor Pusat Umrah Haji Te | ✉️ maqbulah@gmail.com
+2025-11-17 11:42:11 - INFO - Scraping Progress [13/122] (10.7%) - ✅ Zamzam Tours & Travel | ✉️ zamzamst@gmail.com
+2025-11-17 11:43:16 - WARNING -    ⏭️  SKIP: ALFA TOURS (PT ALFA KAZA MUSTIKA) J - Missing: email
+2025-11-17 11:43:44 - INFO - Scraping Progress [14/122] (11.5%) - ✅ MUSLIM TRAVEL INDONESIA | ✉️ hello@muslimtravel.id
+2025-11-17 11:43:58 - INFO - Scraping Progress [15/122] (12.3%) - ✅ Elteyba Tour and Travel | ✉️ elteybatour@yahoo.com
+2025-11-17 11:44:25 - INFO - Scraping Progress [16/122] (13.1%) - ✅ NRA Tour And Travel | ✉️ info@nra-tour.co.id
+2025-11-17 11:44:40 - INFO - Scraping Progress [17/122] (13.9%) - ✅ PT Bashrahil Tur Travel (Umrah Grou | ✉️ info@bashrahiltour.com
+2025-11-17 11:45:04 - INFO - Scraping Progress [18/122] (14.8%) - ✅ Samira Travel - Kantor Pusat | ✉️ info@samiraaliwisata.akselera.
+2025-11-17 11:45:32 - INFO - Scraping Progress [19/122] (15.6%) - ✅ MQ TRAVEL JAKARTA | ✉️ marketingmqtravel@gmail.com
+2025-11-17 11:45:55 - WARNING -    ⏭️  SKIP: Bonita Tour & Umrah - Missing: websiteUrl, email
+2025-11-17 11:46:22 - INFO - Scraping Progress [20/122] (16.4%) - ✅ Travel Umroh Sunnah Jakarta | ✉️ traveldwins@gmail.com
+2025-11-17 11:46:38 - INFO - Scraping Progress [21/122] (17.2%) - ✅ PT. Aldawood Barokah Utama | ✉️ al.dawood.barokah.utama@gmail.
+2025-11-17 11:46:56 - INFO - Scraping Progress [22/122] (18.0%) - ✅ PT Jannah Firdaus Tour & Travel | ✉️ info@jannahfirdaus.com
+2025-11-17 11:48:10 - WARNING -    ⏭️  SKIP: RAMANI TRAVEL (PT. RAUDHAH AMANI WI - Missing: email
+2025-11-17 11:48:36 - INFO - Scraping Progress [23/122] (18.9%) - ✅ Safir Tour & Travel (Haji dan Umrah | ✉️ safiramal15@gmail.com
+2025-11-17 11:48:57 - INFO - Scraping Progress [24/122] (19.7%) - ✅ Batemuri Tour & Travel | ✉️ cs@batemuritour.com
+2025-11-17 11:49:21 - WARNING -    ⏭️  SKIP: Umrah dan Haji - Missing: websiteUrl, email
+2025-11-17 11:49:40 - WARNING -    ⏭️  SKIP: Azza Barokah Madinah Tours & Travel - Missing: email
+2025-11-17 11:50:05 - INFO - Scraping Progress [25/122] (20.5%) - ✅ Jannah Travel | ✉️ info@jannahtravel.id
+2025-11-17 11:50:30 - INFO - Scraping Progress [26/122] (21.3%) - ✅ Travel Umroh & Haji | Rabbanitour J | ✉️ onlinemarketingrabbanitour@gma
+2025-11-17 11:50:45 - INFO - Scraping Progress [27/122] (22.1%) - ✅ Ajmal Noor Wisata - Travel Umroh &  | ✉️ cs.ajmalnoorwisata@gmail.com
+2025-11-17 11:51:40 - WARNING -    ⏭️  SKIP: Balubaid Tour & Travel - Missing: email
+2025-11-17 11:52:54 - WARNING -    ⏭️  SKIP: Marco Tour & Travel - Missing: email
+2025-11-17 11:53:22 - INFO - Scraping Progress [28/122] (23.0%) - ✅ ESQ Tours Travel | ✉️ info@esqtours.com
+2025-11-17 11:53:48 - INFO - Scraping Progress [29/122] (23.8%) - ✅ AL AMIN UNIVERSAL TOURS | ✉️ alaminuniversal.official@gmail
+2025-11-17 11:54:14 - INFO - Scraping Progress [30/122] (24.6%) - ✅ Alhabsyi Travel Haji & Umroh (Trave | ✉️ info@alhabsyitravel.com
+2025-11-17 11:55:08 - WARNING -    ⏭️  SKIP: Al Hijaz Tour & Travel - Missing: email
+2025-11-17 11:56:25 - WARNING -    ⏭️  SKIP: Bani Ahmad Umroh Mandiri Private To - Missing: email
+2025-11-17 11:56:40 - INFO - Scraping Progress [31/122] (25.4%) - ✅ PT. AL AHRAM SARANA WISATA (Sementa | ✉️ al_ahramjkt@yahoo.com
+2025-11-17 11:57:04 - INFO - Scraping Progress [32/122] (26.2%) - ✅ MUSAHEFIZ TOUR & TRAVEL | ✉️ musahefiz@gmail.com
+2025-11-17 11:57:30 - INFO - Scraping Progress [33/122] (27.0%) - ✅ Al Fauzi Group Umrah & Haji Plus | ✉️ infoalfauzigroup@gmail.com
+2025-11-17 11:57:53 - WARNING -    ⏭️  SKIP: Nurani Travel Haji & Umrah - Missing: websiteUrl, email
+2025-11-17 11:58:24 - INFO - Scraping Progress [34/122] (27.9%) - ✅ Salma Tour Travel Haji & Umroh | ✉️ cs@salmatour.co.id
+2025-11-17 11:58:49 - INFO - Scraping Progress [35/122] (28.7%) - ✅ PT. AL HIJRAH MULIA WISATA TOUR & T | ✉️ info@alhijrah.id
+2025-11-17 11:59:12 - WARNING -    ⏭️  SKIP: Madani Tour - Missing: websiteUrl, email
+2025-11-17 11:59:36 - WARNING -    ⏭️  SKIP: MADAFI TRAVEL - Missing: websiteUrl, email
+2025-11-17 12:00:01 - INFO - Scraping Progress [36/122] (29.5%) - ✅ MHU PT. Manasik Haji Umrah Tours &  | ✉️ admin.manasikhajiumrah@gmail.c
+2025-11-17 12:00:27 - INFO - Scraping Progress [37/122] (30.3%) - ✅ ICMI TRAVEL | ✉️ admin@icmitravel.co.id
+2025-11-17 12:00:50 - WARNING -    ⏭️  SKIP: ADzikra Tour & Travel - Missing: websiteUrl, email
+2025-11-17 12:01:16 - INFO - Scraping Progress [38/122] (31.1%) - ✅ Mozaik Travel | ✉️ info@mozaiktravel.id
+2025-11-17 12:01:42 - INFO - Scraping Progress [39/122] (32.0%) - ✅ Cahaya tour | ✉️ cahaya_tour@ymail.com
+2025-11-17 12:02:48 - WARNING -    ⏭️  SKIP: Agen Travel Umroh Haji - Missing: email
+2025-11-17 12:03:13 - INFO - Scraping Progress [40/122] (32.8%) - ✅ Qifaya Tour & Travel | ✉️ info@qifaya.id
+2025-11-17 12:03:57 - WARNING -    ⏭️  SKIP: Rania Hajj Center | PT. Rania Almut - Missing: email
+2025-11-17 12:04:25 - INFO - Scraping Progress [41/122] (33.6%) - ✅ Hisar Global Indonesia HAJI UMROH | ✉️ 605a7baede844d278b89dc95ae0a91
+2025-11-17 12:05:40 - WARNING -    ⏭️  SKIP: Agen Travel Umroh Alburaq - Missing: email
+2025-11-17 12:06:04 - WARNING -    ⏭️  SKIP: Umrah, Hajj & Travel Agency - Missing: email
+2025-11-17 12:06:23 - WARNING -    ⏭️  SKIP: PT. ALBADRIYAH WISATA - Missing: email
+2025-11-17 12:06:46 - WARNING -    ⏭️  SKIP: An Cipta Wisata - Travel Umroh dan  - Missing: websiteUrl, email
+2025-11-17 12:07:10 - WARNING -    ⏭️  SKIP: Simasakti Umroh Jakarta | Umroh & H - Missing: websiteUrl, email
+2025-11-17 12:07:24 - WARNING -    ⏭️  SKIP: ALINDRA HAQEEM TRAVEL - Missing: email
+2025-11-17 12:07:43 - INFO - Scraping Progress [42/122] (34.4%) - ✅ Denatour Travel | ✉️ operation@denatours.com
+2025-11-17 12:08:17 - WARNING -    ⏭️  SKIP: Kantor Operasional Alfajr Tour & Tr - Missing: websiteUrl, email
+2025-11-17 12:08:40 - WARNING -    ⏭️  SKIP: PT Arofah Travel Mandiri (ATM Tours - Missing: websiteUrl, email
+2025-11-17 12:09:04 - WARNING -    ⏭️  SKIP: Alfir Wisata Utama Tour & Travel - Missing: websiteUrl, email
+2025-11-17 12:09:20 - INFO - Scraping Progress [43/122] (35.2%) - ✅ Jendela Tours & Travel | ✉️ info@jendelatours.com
+2025-11-17 12:09:35 - WARNING -    ⏭️  SKIP: Al-Aqsha Jisru Dakwah - Missing: email
+2025-11-17 12:09:59 - WARNING -    ⏭️  SKIP: Asamulia Tour & Travel - Missing: websiteUrl, email
+2025-11-17 12:10:15 - INFO - Scraping Progress [44/122] (36.1%) - ✅ Hadiyya Umrah | ✉️ contact@hadiyyaumrah.com
+2025-11-17 12:11:10 - WARNING -    ⏭️  SKIP: Alsha Tour Travel - Missing: email
+2025-11-17 12:11:35 - INFO - Scraping Progress [45/122] (36.9%) - ✅ Selaras Wisata - Umroh & Haji Trave | ✉️ info@selaraswisata.com
+2025-11-17 12:11:59 - WARNING -    ⏭️  SKIP: Agen Travel Vianzo Jakarta timur - Missing: websiteUrl, email
+2025-11-17 12:12:34 - INFO - Scraping Progress [46/122] (37.7%) - ✅ Tursina Tours | ✉️ sales@tursina.co.id
+2025-11-17 12:13:00 - INFO - Scraping Progress [47/122] (38.5%) - ✅ Mitra Wisata Mandiri | ✉️ info@mitrawisatamandiri.co.id
+2025-11-17 12:13:47 - WARNING -    ⏭️  SKIP: Satutours - Missing: email
+2025-11-17 12:14:13 - INFO - Scraping Progress [48/122] (39.3%) - ✅ Patuna Travel Head Office | ✉️ info@patunatravel.id
+2025-11-17 12:14:39 - INFO - Scraping Progress [49/122] (40.2%) - ✅ HaramainKU - PT. Kartika Utama | Tr | ✉️ info@haramainku.com
+2025-11-17 12:14:56 - INFO - Scraping Progress [50/122] (41.0%) - ✅ Percaya Umroh - Travel Resmi Penyel | ✉️ info@percayaumroh.com
+2025-11-17 12:15:20 - INFO - Scraping Progress [51/122] (41.8%) - ✅ Al Haramain Jaya Wisata | ✉️ hjw.care@alharamainjayawisata.
+2025-11-17 12:15:44 - WARNING -    ⏭️  SKIP: Sahid Tour - Missing: websiteUrl, email
+2025-11-17 12:16:00 - INFO - Scraping Progress [52/122] (42.6%) - ✅ Jendela Baitullah | ✉️ info@jendelabaitullah.com
+2025-11-17 12:16:14 - INFO - Scraping Progress [53/122] (43.4%) - ✅ Maheer Travelindo | ✉️ info@maheertravelindo.com
+2025-11-17 12:16:48 - INFO - Scraping Progress [54/122] (44.3%) - ✅ DALLAS TOUR & TRAVEL | ✉️ business@deltalaraswisata.com
+2025-11-17 12:17:13 - INFO - Scraping Progress [55/122] (45.1%) - ✅ Almadinah Land Arrangement Umroh &  | ✉️ admin@almadinah.co.id
+2025-11-17 12:17:29 - INFO - Scraping Progress [56/122] (45.9%) - ✅ Tyaratour Umrah & Hajj Services | ✉️ info@tyaratour.id
+2025-11-17 12:17:53 - WARNING -    ⏭️  SKIP: PT. Tamasya Indah Tour & Travel - Missing: email
+2025-11-17 12:18:16 - WARNING -    ⏭️  SKIP: TANUR MUTHMAINAH TOUR UMROH HAJJ - Missing: websiteUrl, email
+2025-11-17 12:19:13 - WARNING -    ⏭️  SKIP: Alhijaz Indowisata - Missing: email
+2025-11-17 12:19:37 - INFO - Scraping Progress [57/122] (46.7%) - ✅ ANAMTA Tour & Travel - PT. Annur Ma | ✉️ umroh.anamta@gmail.com
+2025-11-17 12:20:02 - INFO - Scraping Progress [58/122] (47.5%) - ✅ GRHA MULTAZAM | ✉️ cs@multazam.co.id
+2025-11-17 12:20:25 - WARNING -    ⏭️  SKIP: Alaransel Tour & Umroh - Missing: email
+2025-11-17 12:21:35 - WARNING -    ⏭️  SKIP: PT. SINDO WISATA TRAVEL - Missing: email
+2025-11-17 12:21:50 - INFO - Scraping Progress [59/122] (48.4%) - ✅ GWI TOURS & TRAVEL | ✉️ indo@wisataidaman.com
+2025-11-17 12:22:14 - WARNING -    ⏭️  SKIP: Dua Ribu Wisata - Missing: websiteUrl, email
+2025-11-17 12:22:39 - INFO - Scraping Progress [60/122] (49.2%) - ✅ Albis Nusa Wisata Tour & Travel | ✉️ albisnusawisata@gmail.com
+2025-11-17 12:23:04 - INFO - Scraping Progress [61/122] (50.0%) - ✅ PT PANTRAVEL | ✉️ reservation@pantravel.co.id
+2025-11-17 12:23:34 - INFO - Scraping Progress [62/122] (50.8%) - ✅ PT. Aida Tourindo Wisata | ✉️ info@aidatourindo.com
+2025-11-17 12:24:00 - INFO - Scraping Progress [63/122] (51.6%) - ✅ Alia Wisata | ✉️ info@aliawisata.com
+2025-11-17 12:24:24 - WARNING -    ⏭️  SKIP: Alhamdi Umrah & Haji Khusus - Missing: websiteUrl, email
+2025-11-17 12:25:10 - WARNING -    ⏭️  SKIP: Cheria Holiday Pelopor Wisata Halal - Missing: email
+2025-11-17 12:25:34 - WARNING -    ⏭️  SKIP: Al Hajj Umrah Land Arrangement (Umr - Missing: websiteUrl, email
+2025-11-17 12:25:58 - WARNING -    ⏭️  SKIP: Pakem Tours - Missing: websiteUrl, email
+2025-11-17 12:27:04 - WARNING -    ⏭️  SKIP: Jannah Firdaus Travel (Agen) - Missing: email
+2025-11-17 12:27:30 - INFO - Scraping Progress [64/122] (52.5%) - ✅ PT. Baitussalam Mandiri | ✉️ salam@baitussalammandiri.com
+2025-11-17 12:27:53 - WARNING -    ⏭️  SKIP: Indah Wisata - Missing: websiteUrl, email
+2025-11-17 12:28:27 - WARNING -    ⏭️  SKIP: GRASINDO TRAVEL HAJI DAN UMROH - Missing: websiteUrl, email
+2025-11-17 12:29:14 - WARNING -    ⏭️  SKIP: PT. BUANA INTIDAYA MANDIRI (BIM TOU - Missing: email
+2025-11-17 12:30:28 - WARNING -    ⏭️  SKIP: Travel Haji & Umroh Alhijaz - Missing: email
+2025-11-17 12:30:54 - INFO - Scraping Progress [65/122] (53.3%) - ✅ PT. Asia Utama WIsata (ASIATOUR) | ✉️ marketing@asiatour.co.id
+2025-11-17 12:31:17 - WARNING -    ⏭️  SKIP: Travel Haji dan Umroh PT. Usaha Kit - Missing: websiteUrl, email
+2025-11-17 12:31:17 - INFO - ✅ Scraping Progress Processing selesai - Total: 65/122
+2025-11-17 12:31:21 - INFO - ✨ Browser ditutup, cleanup selesai

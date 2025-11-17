@@ -1,4 +1,7 @@
-pandas
-selenium
-webdriver-manager
-openpyxl
+# Core dependencies
+selenium>=4.15.0
+webdriver-manager>=4.0.0
+
+# Optional (jika ingin export ke Excel)
+pandas>=2.0.0
+openpyxl>=3.1.0
