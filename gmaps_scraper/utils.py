@@ -26,8 +26,12 @@ from selenium.common.exceptions import (
 )
 
 # Import local modules
-from . import constants as const
-from .config import ScraperConfig
+try:
+    from . import constants as const
+    from .config import ScraperConfig
+except ImportError:
+    import constants as const
+    from config import ScraperConfig
 
 # Setup logger
 logger = logging.getLogger(__name__)

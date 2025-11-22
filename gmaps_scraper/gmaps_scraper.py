@@ -42,30 +42,59 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
 # Import local modules
-from . import constants as const
-from .config import ScraperConfig
-from .exceptions import (
-    WebDriverSetupError,
-    SearchError,
-    NoResultsFoundError,
-    ScrapeError,
-    EmailExtractionError
-)
-from .utils import (
-    retry_on_failure,
-    safe_find_element,
-    validate_email,
-    extract_email_from_text,
-    extract_city_from_address,
-    sanitize_filename,
-    close_extra_tabs,
-    scroll_element,
-    format_phone_number,
-    validate_data,
-    truncate_fields,
-    ProgressTracker,
-    DataStatistics
-)
+# Support both direct script execution and package import
+try:
+    # Try relative imports (when used as package)
+    from . import constants as const
+    from .config import ScraperConfig
+    from .exceptions import (
+        WebDriverSetupError,
+        SearchError,
+        NoResultsFoundError,
+        ScrapeError,
+        EmailExtractionError
+    )
+    from .utils import (
+        retry_on_failure,
+        safe_find_element,
+        validate_email,
+        extract_email_from_text,
+        extract_city_from_address,
+        sanitize_filename,
+        close_extra_tabs,
+        scroll_element,
+        format_phone_number,
+        validate_data,
+        truncate_fields,
+        ProgressTracker,
+        DataStatistics
+    )
+except ImportError:
+    # Fall back to absolute imports (when run as script)
+    import constants as const
+    from config import ScraperConfig
+    from exceptions import (
+        WebDriverSetupError,
+        SearchError,
+        NoResultsFoundError,
+        ScrapeError,
+        EmailExtractionError
+    )
+    from utils import (
+        retry_on_failure,
+        safe_find_element,
+        validate_email,
+        extract_email_from_text,
+        extract_city_from_address,
+        sanitize_filename,
+        close_extra_tabs,
+        scroll_element,
+        format_phone_number,
+        validate_data,
+        truncate_fields,
+        ProgressTracker,
+        DataStatistics
+    )
 
 # Setup logging
 logging.basicConfig(

@@ -18,7 +18,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
 # Import constants
-from . import constants as const
+try:
+    from . import constants as const
+except ImportError:
+    import constants as const
 
 
 class ScraperConfig:

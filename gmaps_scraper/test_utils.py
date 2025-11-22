@@ -19,18 +19,32 @@ import pytest
 from typing import Dict
 
 # Import functions to test
-from .utils import (
-    validate_email,
-    extract_email_from_text,
-    extract_city_from_address,
-    sanitize_filename,
-    format_phone_number,
-    validate_data,
-    truncate_fields,
-    DataStatistics
-)
-from . import constants as const
-from .config import ScraperConfig
+try:
+    from .utils import (
+        validate_email,
+        extract_email_from_text,
+        extract_city_from_address,
+        sanitize_filename,
+        format_phone_number,
+        validate_data,
+        truncate_fields,
+        DataStatistics
+    )
+    from . import constants as const
+    from .config import ScraperConfig
+except ImportError:
+    from utils import (
+        validate_email,
+        extract_email_from_text,
+        extract_city_from_address,
+        sanitize_filename,
+        format_phone_number,
+        validate_data,
+        truncate_fields,
+        DataStatistics
+    )
+    import constants as const
+    from config import ScraperConfig
 
 
 class TestEmailValidation:
