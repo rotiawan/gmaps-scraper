@@ -1,196 +1,312 @@
-# ⚡ Quick Start Guide
+# 🚀 Quick Start Guide - Google Maps Lead Scraper
 
-## 🎯 Install & Run dalam 3 Menit
+## 📦 Installation
 
-### 1️⃣ Install Dependencies
+### Option 1: Install Dependencies Only (Recommended untuk pemula)
+
 ```bash
+# 1. Clone repository
+git clone https://github.com/rotiawan/gmaps-scraper.git
+cd gmaps-scraper
+
+# 2. Masuk ke folder gmaps_scraper
+cd gmaps_scraper
+
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2️⃣ Run Scraper
+### Option 2: Install sebagai Package (Advanced)
+
 ```bash
+# Clone dan install package
+git clone https://github.com/rotiawan/gmaps-scraper.git
+cd gmaps-scraper
+pip install -e .
+```
+
+---
+
+## 🏃 Running the Scraper
+
+### Method 1: Direct Script Execution (Simple)
+
+```bash
+# Dari folder gmaps_scraper/
+cd gmaps_scraper
 python gmaps_scraper.py
 ```
 
-### 3️⃣ Input Data
-```
-📍 Masukkan kata kunci: travel agent di Jakarta
-📜 Maksimal scroll: 15 (atau Enter untuk default)
-🔇 Headless mode: n (atau Enter untuk default)
-```
+### Method 2: As Python Module (Recommended)
 
-### 4️⃣ Lihat Hasil
-```
-📁 File tersimpan di: results/travel_agent_di_jakarta_20251117_143022.csv
-```
-
----
-
-## 🎮 Contoh Penggunaan
-
-### Contoh 1: Basic Search
-```
-Input: hotel di Bali
-Max scroll: 10
-Output: ~100-150 data hotel
-```
-
-### Contoh 2: Specific Location
-```
-Input: restoran di Bandung
-Max scroll: 20
-Output: ~200-300 data restoran
-```
-
-### Contoh 3: Niche Business
-```
-Input: coworking space Jakarta Selatan
-Max scroll: 5
-Output: ~50-75 data coworking
-```
-
----
-
-## 📊 Expected Results
-
-| Scroll | Estimated Data | Time Required |
-|--------|---------------|---------------|
-| 5      | ~50 items     | ~5 menit      |
-| 10     | ~100 items    | ~10 menit     |
-| 15     | ~150 items    | ~15 menit     |
-| 20     | ~200 items    | ~20 menit     |
-
-*Waktu bervariasi tergantung koneksi internet dan website speed*
-
----
-
-## 🔧 Troubleshooting Cepat
-
-### ❌ Error: ChromeDriver not found
 ```bash
-# Install ulang webdriver-manager
-pip install --upgrade webdriver-manager
+# Dari root folder (Gmaps-Lead-Scraper/)
+cd D:\magang\Gmaps-Lead-Scraper
+python -m gmaps_scraper.gmaps_scraper
 ```
 
-### ❌ Error: Module not found
+### Method 3: As Installed Package (Jika sudah install dengan pip)
+
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### ❌ Browser tidak buka
-```bash
-# Update Chrome ke versi terbaru
-# Download di: https://www.google.com/chrome/
-```
-
-### ❌ No data found
-- Coba kata kunci yang lebih spesifik
-- Check koneksi internet
-- Coba scroll lebih banyak
-
----
-
-## 💡 Tips untuk Hasil Maksimal
-
-### ✅ Best Practices:
-1. **Gunakan kata kunci spesifik** 
-   - ✅ "travel agent di Jakarta Pusat"
-   - ❌ "travel"
-
-2. **Tentukan scroll sesuai kebutuhan**
-   - Small dataset: 5-10 scroll
-   - Large dataset: 15-20 scroll
-
-3. **Run di waktu non-peak**
-   - Malam hari = koneksi lebih stabil
-   - Siang hari = lebih ramai
-
-4. **Check log file untuk debugging**
-   ```bash
-   tail -f scraper.log
-   ```
-
----
-
-## 📱 Output Format
-
-CSV file dengan kolom:
-```
-namaTravel, alamat, kota, telepon, deskripsi, websiteUrl, logoUrl, email, mapUrl
-```
-
-### Contoh Data:
-```csv
-ABC Travel,Jl. Sudirman No.123,Jakarta,021-12345678,Travel Agency,https://abc.com,https://...,info@abc.com,https://maps.google.com/...
+# Dari mana saja
+gmaps-scraper
 ```
 
 ---
 
-## 🎨 Customization
+## 📝 Penggunaan
 
-### Change Default Settings:
-Edit `config.py`:
+### Interactive CLI
+
+Setelah menjalankan script, ikuti prompt interaktif:
+
+```
+🗺️  GOOGLE MAPS LEAD SCRAPER - VERSION 18.0.0
+======================================================================
+
+📍 Masukkan kata kunci pencarian (contoh: 'travel agent di Jakarta'):
+> travel umroh di Jakarta
+
+📜 Maksimal scroll (default: 15, Enter = default):
+> 20
+
+🔍 Pilih Data Validation Mode:
+   1. STRICT   - Semua field wajib terisi (~10-20% data tersimpan)
+   2. MODERATE - Minimal: nama, website, email (~20-30% data tersimpan) [RECOMMENDED]
+   3. LENIENT  - Minimal: nama, telepon (~80-90% data tersimpan)
+   4. NONE     - Simpan semua data tanpa filter (~100% data tersimpan)
+Pilih mode (1-4, default: 2):
+> 2
+
+🔇 Jalankan headless mode? (y/n, default: n):
+> n
+
+🚀 Memulai scraping...
+```
+
+---
+
+## 🐍 Programmatic Usage
+
+Untuk menggunakan dalam Python script Anda sendiri:
 
 ```python
-# Lebih cepat (reduce timeout)
-ScraperConfig.DETAIL_PAGE_DELAY = 1  # dari 3
+from gmaps_scraper import GoogleMapsScraper, ScraperConfig
 
-# Lebih teliti (increase timeout)
-ScraperConfig.EMAIL_BODY_WAIT = 10  # dari 7
+# Configure validation mode
+ScraperConfig.VALIDATION_MODE = 'MODERATE'
 
-# More retries
-ScraperConfig.MAX_RETRIES = 5  # dari 3
-```
-
----
-
-## 🚀 Advanced Usage
-
-### Programmatic Usage:
-```python
-from gmaps_scraper import GoogleMapsScraper
-
-# Create scraper instance
+# Initialize scraper
 scraper = GoogleMapsScraper(headless=True)
 
 # Run scraping
-output_file, count = scraper.run(
-    query="restaurant in Jakarta",
+output_file, count, stats = scraper.run(
+    query="travel agent Jakarta",
     max_scrolls=20
 )
 
+# Print statistics
+print(stats.get_summary())
 print(f"Saved to: {output_file}")
-print(f"Total: {count} records")
 ```
 
-### Batch Processing:
+---
+
+## 🧪 Running Tests
+
+```bash
+# Install pytest (jika belum)
+pip install pytest pytest-cov
+
+# Run tests
+cd gmaps_scraper
+pytest test_utils.py -v
+
+# Dengan coverage report
+pytest test_utils.py --cov=. --cov-report=html
+```
+
+---
+
+## 📁 Output Files
+
+Results akan tersimpan di folder `results/`:
+
+```
+gmaps_scraper/results/
+└── travel_agent_jakarta_20251122_143025.csv
+```
+
+Format CSV:
+```csv
+namaTravel,alamat,kota,telepon,deskripsi,websiteUrl,logoUrl,email,mapUrl
+"PT Travel Mandiri","Jl. Thamrin No.1, Jakarta","Jakarta","+62211234567","Travel agency","https://example.com","https://...","info@example.com","https://maps.google.com/..."
+```
+
+---
+
+## ⚙️ Configuration
+
+### Custom Configuration
+
+Edit `config.py` untuk customize settings:
+
 ```python
+# Timeout settings
+PAGE_LOAD_TIMEOUT = 300  # detik
+EMAIL_PAGE_LOAD_TIMEOUT = 10  # detik
+
+# Scroll behavior
+SCROLL_PAUSE_TIME = 3  # detik
+DEFAULT_MAX_SCROLLS = 15
+
+# Validation mode (bisa diubah via CLI juga)
+VALIDATION_MODE = 'MODERATE'
+```
+
+### Environment Variables (Optional)
+
+Buat file `.env` untuk custom settings:
+
+```bash
+LOG_LEVEL=DEBUG
+HEADLESS=true
+MAX_SCROLLS=30
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Problem: ImportError: attempted relative import
+
+**Solution:** Gunakan salah satu method di atas untuk running script.
+
+```bash
+# ✅ BENAR:
+cd gmaps_scraper
+python gmaps_scraper.py
+
+# ✅ BENAR:
+python -m gmaps_scraper.gmaps_scraper
+
+# ❌ SALAH:
+python D:\magang\Gmaps-Lead-Scraper\gmaps_scraper\gmaps_scraper.py
+```
+
+### Problem: Chrome driver not found
+
+**Solution:** WebDriver Manager akan auto-download. Pastikan internet stabil.
+
+```bash
+# Manual install jika perlu
+pip install --upgrade webdriver-manager
+```
+
+### Problem: Script hang/stuck
+
+**Solution:** 
+- Tekan `Ctrl+C` untuk graceful shutdown
+- Data yang sudah di-scrape akan tetap tersimpan
+- Check `scraper.log` untuk detail error
+
+### Problem: No data saved
+
+**Solution:**
+- Pilih validation mode yang lebih lenient (LENIENT atau NONE)
+- Tingkatkan `max_scrolls`
+- Check koneksi internet
+- Pastikan keyword tidak terlalu spesifik
+
+---
+
+## 📊 Tips untuk Hasil Maksimal
+
+### 1. Keyword Strategy
+
+```bash
+# ✅ BAIK - Spesifik dengan lokasi
+"travel umroh di Jakarta Selatan"
+"hotel di Bali dekat pantai"
+"restoran jepang di Surabaya"
+
+# ❌ KURANG BAIK - Terlalu umum
+"travel"
+"hotel"
+"restoran"
+```
+
+### 2. Validation Mode Selection
+
+| Mode | Use Case | Expected Results |
+|------|----------|------------------|
+| **STRICT** | Need high-quality leads with complete info | 10-20% data |
+| **MODERATE** | Need leads with email (RECOMMENDED) | 20-30% data |
+| **LENIENT** | Need many leads with phone numbers | 80-90% data |
+| **NONE** | Research/analysis, need all data | 100% data |
+
+### 3. Max Scrolls Recommendation
+
+| Purpose | Max Scrolls | Expected Results |
+|---------|-------------|------------------|
+| Quick test | 5-10 | 20-50 businesses |
+| Normal usage | 20-30 | 100-150 businesses |
+| Comprehensive | 50+ | 300+ businesses |
+
+---
+
+## 🎯 Example Workflows
+
+### Example 1: Quick Test
+
+```bash
+cd gmaps_scraper
+python gmaps_scraper.py
+
+# Input:
+# Query: travel agent Jakarta
+# Scrolls: 5
+# Mode: NONE (untuk test semua data)
+# Headless: n
+```
+
+### Example 2: Production Scraping
+
+```bash
+python -m gmaps_scraper.gmaps_scraper
+
+# Input:
+# Query: hotel bintang 4 di Bali
+# Scrolls: 30
+# Mode: MODERATE (quality leads dengan email)
+# Headless: y (faster)
+```
+
+### Example 3: Bulk Scraping (Python Script)
+
+```python
+from gmaps_scraper import GoogleMapsScraper, ScraperConfig
+
 queries = [
-    "hotel di Bali",
-    "restaurant di Bandung", 
-    "cafe di Yogyakarta"
+    "travel umroh di Jakarta",
+    "travel haji di Surabaya",
+    "tour organizer di Bandung"
 ]
 
-scraper = GoogleMapsScraper(headless=True)
-
 for query in queries:
-    print(f"Processing: {query}")
-    scraper.run(query, max_scrolls=10)
+    scraper = GoogleMapsScraper(headless=True)
+    output, count, stats = scraper.run(query, max_scrolls=20)
+    print(f"✅ {query}: {count} leads saved")
 ```
 
 ---
 
-## 📞 Need Help?
+## 🆘 Need Help?
 
-1. **Check README.md** - Comprehensive documentation
-2. **Check IMPROVEMENTS.md** - What's new in v18
-3. **Check scraper.log** - Detailed error logs
-4. **Check results/** folder - Your CSV outputs
+- **Documentation**: Read `REFACTORING_NOTES.md` untuk detail teknis
+- **Issues**: Report bugs di [GitHub Issues](https://github.com/rotiawan/gmaps-scraper/issues)
+- **Logs**: Check `scraper.log` untuk detailed error messages
 
 ---
 
-**Happy Scraping! 🎉**
-
-*Jika ada pertanyaan, refer to README.md atau check log file*
-
+**Happy Scraping! 🚀**
