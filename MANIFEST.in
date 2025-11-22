@@ -1,0 +1,25 @@
+# MANIFEST.in
+# File untuk specify file tambahan yang akan di-include dalam package distribution
+
+# Include README dan documentation
+include README.md
+include LICENSE
+
+# Include requirements
+include gmaps_scraper/requirements.txt
+
+# Include documentation files
+include gmaps_scraper/*.md
+recursive-include gmaps_scraper *.md
+
+# Exclude test files dari distribution
+recursive-exclude tests *
+recursive-exclude gmaps_scraper/results *.csv
+recursive-exclude gmaps_scraper/results *.xlsx
+
+# Exclude cache dan compiled files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store
+

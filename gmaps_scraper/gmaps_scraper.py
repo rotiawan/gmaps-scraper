@@ -1,22 +1,26 @@
 """
-Google Maps Lead Scraper - Improved Version v18
-================================================
-Scraper untuk mengambil data travel agent dari Google Maps
+Google Maps Lead Scraper - Refactored Version v18
+==================================================
+
+Professional scraper untuk mengambil data lead bisnis dari Google Maps
 dengan fitur email extraction dari website.
 
 Features:
-- ✅ Logging system yang proper
-- ✅ Configuration management
+- ✅ Modular architecture dengan separation of concerns
+- ✅ Comprehensive logging system
+- ✅ Configuration management dengan constants
+- ✅ Custom exceptions untuk better error handling
 - ✅ Retry mechanism dengan exponential backoff
 - ✅ Progress tracking yang informatif
-- ✅ Helper functions untuk reduce duplication
-- ✅ Better error handling
-- ✅ Email validation yang robust
-- ✅ Type hints untuk code quality
+- ✅ Email extraction dengan 3 metode
+- ✅ Data validation dengan multiple modes
+- ✅ Type hints dan docstrings lengkap
 - ✅ Graceful shutdown handler
+- ✅ Mengikuti PEP 8 dan SOLID principles
 
-Author: Improved Version
-Date: 2025-11-17
+Author: rotiawan
+Date: 2025-11-22
+Version: 18.0.0
 """
 
 import csv
@@ -37,9 +41,17 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
-# Import custom modules
-from config import ScraperConfig
-from utils import (
+# Import local modules
+from . import constants as const
+from .config import ScraperConfig
+from .exceptions import (
+    WebDriverSetupError,
+    SearchError,
+    NoResultsFoundError,
+    ScrapeError,
+    EmailExtractionError
+)
+from .utils import (
     retry_on_failure,
     safe_find_element,
     validate_email,
@@ -62,42 +74,78 @@ logging.basicConfig(
     datefmt=ScraperConfig.LOG_DATE_FORMAT,
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('scraper.log', encoding='utf-8')
+        logging.FileHandler(
+            ScraperConfig.LOG_FILE_NAME,
+            encoding='utf-8',
+            mode='a'
+        )
     ]
 )
 logger = logging.getLogger(__name__)
 
-# Global variable untuk graceful shutdown
+# Global flag untuk graceful shutdown
 shutdown_requested = False
 
 
-def signal_handler(signum, frame):
-    """Handler untuk graceful shutdown saat Ctrl+C"""
+def signal_handler(signum: int, frame) -> None:
+    """
+    Handler untuk graceful shutdown saat Ctrl+C.
+    
+    Args:
+        signum: Signal number
+        frame: Current stack frame
+    """
     global shutdown_requested
     logger.warning("\n⚠️  Shutdown request diterima. Menyelesaikan proses...")
     shutdown_requested = True
 
 
-# Register signal handler
+# Register signal handler untuk SIGINT (Ctrl+C)
 signal.signal(signal.SIGINT, signal_handler)
 
 
 class EmailFinder:
-    """Class untuk mencari email di website dengan berbagai metode"""
+    """
+    Class untuk mencari dan mengekstrak email dari website bisnis.
+    
+    Menggunakan 3 metode extraction:
+    1. Mencari mailto: links (paling akurat)
+    2. Regex pattern matching di page source
+    3. Scanning visible elements (footer, contact section)
+    
+    Attributes:
+        driver: Selenium WebDriver instance
+        original_timeout: Original page load timeout untuk restore nanti
+    """
     
     def __init__(self, driver: webdriver.Chrome):
+        """
+        Initialize EmailFinder.
+        
+        Args:
+            driver: Selenium WebDriver instance
+        """
         self.driver = driver
         self.original_timeout = driver.timeouts.page_load
     
     def find_email_on_website(self, website_url: str) -> str:
         """
-        Mencari email di website menggunakan multiple methods
+        Mencari email di website menggunakan multiple methods.
+        
+        Process:
+        1. Buka website di tab baru (untuk isolation)
+        2. Set timeout pendek (anti-stuck)
+        3. Try 3 extraction methods secara berurutan
+        4. Cleanup dan close tab
         
         Args:
             website_url: URL website yang akan di-scan
         
         Returns:
             Email address jika ditemukan, empty string jika tidak
+        
+        Note:
+            Method ini akan gracefully handle timeout dan errors.
         """
         email = ""
         original_window = self.driver.current_window_handle
@@ -106,35 +154,38 @@ class EmailFinder:
             # Set timeout pendek untuk anti-stuck
             self.driver.set_page_load_timeout(ScraperConfig.EMAIL_PAGE_LOAD_TIMEOUT)
             
-            # Buka di tab baru
+            # Buka di tab baru untuk isolation
             self.driver.execute_script("window.open('');")
             self.driver.switch_to.window(self.driver.window_handles[-1])
             
             logger.debug(f"   → Scanning website: {website_url}")
             self.driver.get(website_url)
             
-            # Wait for body
+            # Wait for body element
             WebDriverWait(self.driver, ScraperConfig.EMAIL_BODY_WAIT).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
             
-            # Method 1: Cari mailto: links (paling akurat)
+            # Method 1: Mailto links (paling akurat)
             email = self._find_by_mailto()
             
-            # Method 2: Cari dengan regex di page source
+            # Method 2: Regex di page source
             if not email:
                 email = self._find_by_regex()
             
-            # Method 3: Cari di visible text elements
+            # Method 3: Visible text elements
             if not email:
                 email = self._find_in_visible_elements()
             
         except TimeoutException:
             logger.debug(f"   ⏱️  Timeout saat load website: {website_url}")
+            
         except WebDriverException as e:
             logger.debug(f"   ⚠️  WebDriver error: {str(e)[:100]}")
+            
         except Exception as e:
             logger.debug(f"   ❌ Error scanning website: {str(e)[:100]}")
+            
         finally:
             # Cleanup: restore timeout & close tab
             self.driver.set_page_load_timeout(self.original_timeout)
@@ -149,38 +200,63 @@ class EmailFinder:
         return email
     
     def _find_by_mailto(self) -> str:
-        """Cari email melalui mailto: links"""
+        """
+        Method 1: Cari email via mailto: links.
+        Paling akurat karena explicit email link.
+        
+        Returns:
+            Email address atau empty string
+        """
         try:
             mailto_links = self.driver.find_elements(
-                By.XPATH, 
-                ScraperConfig.SELECTORS['mailto_links']
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_MAILTO]
             )
+            
             if mailto_links:
                 href = mailto_links[0].get_attribute('href')
+                # Parse mailto:email@domain.com?subject=...
                 email = href.replace('mailto:', '').split('?')[0].strip()
+                
                 if validate_email(email):
                     logger.debug(f"   ✅ Email found via mailto: {email}")
                     return email
+                    
         except Exception as e:
             logger.debug(f"   Mailto method error: {e}")
+        
         return ""
     
     def _find_by_regex(self) -> str:
-        """Cari email dengan regex di page source"""
+        """
+        Method 2: Cari email dengan regex pattern di page source.
+        
+        Returns:
+            Email address atau empty string
+        """
         try:
             page_source = self.driver.page_source.lower()
             email = extract_email_from_text(page_source)
+            
             if email:
                 logger.debug(f"   ✅ Email found via regex: {email}")
                 return email
+                
         except Exception as e:
             logger.debug(f"   Regex method error: {e}")
+        
         return ""
     
     def _find_in_visible_elements(self) -> str:
-        """Cari email di visible text elements (footer, contact section, etc)"""
+        """
+        Method 3: Cari email di visible text elements.
+        Fokus ke footer, contact section, dll.
+        
+        Returns:
+            Email address atau empty string
+        """
         try:
-            # Cari di common elements yang biasa contain email
+            # Common selectors untuk email
             selectors = [
                 "//footer",
                 "//*[contains(@class, 'contact')]",
@@ -191,37 +267,65 @@ class EmailFinder:
             
             for selector in selectors:
                 elements = self.driver.find_elements(By.XPATH, selector)
-                for element in elements[:3]:  # Limit to first 3 matches
+                
+                # Limit to first 3 matches untuk efficiency
+                for element in elements[:3]:
                     text = element.text.lower()
                     email = extract_email_from_text(text)
+                    
                     if email:
                         logger.debug(f"   ✅ Email found in visible element: {email}")
                         return email
+                        
         except Exception as e:
             logger.debug(f"   Visible elements method error: {e}")
+        
         return ""
 
 
 class GoogleMapsScraper:
-    """Main scraper class untuk Google Maps"""
+    """
+    Main scraper class untuk Google Maps lead generation.
+    
+    Responsibilities:
+    - Setup WebDriver
+    - Search di Google Maps
+    - Collect links dari hasil search
+    - Scrape detail dari setiap bisnis
+    - Extract email dari website (via EmailFinder)
+    - Validate dan save data ke CSV
+    
+    Attributes:
+        driver: Selenium WebDriver instance
+        wait: WebDriverWait instance
+        email_finder: EmailFinder instance
+        headless: Flag untuk headless mode
+    """
     
     def __init__(self, headless: bool = False):
+        """
+        Initialize scraper.
+        
+        Args:
+            headless: Jika True, run browser dalam headless mode
+        """
         self.driver: Optional[webdriver.Chrome] = None
         self.wait: Optional[WebDriverWait] = None
         self.email_finder: Optional[EmailFinder] = None
         self.headless = headless
-        
+    
     def setup_driver(self) -> None:
-        """Setup Selenium WebDriver dengan configuration"""
+        """
+        Setup Selenium WebDriver dengan configuration optimal.
+        
+        Raises:
+            WebDriverSetupError: Jika gagal setup WebDriver
+        """
         logger.info("🔧 Setup Selenium WebDriver...")
         
         try:
             service = Service(ChromeDriverManager().install())
-            options = ScraperConfig.get_chrome_options()
-            
-            if self.headless:
-                options.add_argument('--headless=new')
-                options.add_argument('--disable-gpu')
+            options = ScraperConfig.get_chrome_options(headless=self.headless)
             
             self.driver = webdriver.Chrome(service=service, options=options)
             self.driver.set_page_load_timeout(ScraperConfig.PAGE_LOAD_TIMEOUT)
@@ -230,161 +334,253 @@ class GoogleMapsScraper:
             self.wait = WebDriverWait(self.driver, ScraperConfig.EXPLICIT_WAIT)
             self.email_finder = EmailFinder(self.driver)
             
-            logger.info("✅ WebDriver berhasil di-setup")
+            logger.info(f"✅ {const.SUCCESS_WEBDRIVER}")
+            
         except Exception as e:
-            logger.error(f"❌ Gagal setup WebDriver: {e}")
-            raise
+            error_msg = f"{const.ERROR_WEBDRIVER_SETUP}: {e}"
+            logger.error(error_msg)
+            raise WebDriverSetupError(details=str(e))
     
     @retry_on_failure(max_retries=2, delay=3)
     def search_google_maps(self, query: str) -> None:
-        """Buka Google Maps dan lakukan pencarian"""
+        """
+        Buka Google Maps dan lakukan pencarian.
+        
+        Args:
+            query: Search query string
+        
+        Raises:
+            SearchError: Jika search gagal
+        """
         logger.info(f"🔎 Mencari: '{query}'")
         
-        self.driver.get("https://www.google.com/maps")
-        
-        search_box = self.wait.until(
-            EC.element_to_be_clickable(ScraperConfig.SELECTORS['search_box'])
-        )
-        search_box.clear()
-        search_box.send_keys(query)
-        search_box.send_keys(Keys.ENTER)
-        
-        time.sleep(ScraperConfig.AFTER_SEARCH_DELAY)
-        logger.info("✅ Pencarian berhasil")
+        try:
+            self.driver.get(const.GOOGLE_MAPS_URL)
+            
+            # Find search box dan input query
+            search_box = self.wait.until(
+                EC.element_to_be_clickable(
+                    ScraperConfig.SELECTORS[const.SELECTOR_ID_SEARCH_BOX]
+                )
+            )
+            search_box.clear()
+            search_box.send_keys(query)
+            search_box.send_keys(Keys.ENTER)
+            
+            # Wait for results to load
+            time.sleep(ScraperConfig.AFTER_SEARCH_DELAY)
+            
+            logger.info(f"✅ {const.SUCCESS_SEARCH}")
+            
+        except Exception as e:
+            error_msg = f"Search failed for query '{query}': {e}"
+            logger.error(error_msg)
+            raise SearchError(query=query, details=str(e))
     
     def collect_links(self, max_scrolls: int) -> List[str]:
         """
-        Scroll hasil dan kumpulkan semua link unik
+        Scroll hasil pencarian dan kumpulkan semua link unik.
+        
+        Process:
+        1. Find scrollable feed element
+        2. Scroll bertahap dengan pause
+        3. Detect end of list
+        4. Collect unique links
         
         Args:
             max_scrolls: Maksimal jumlah scroll
         
         Returns:
-            List of unique URLs
+            List of unique business URLs
+        
+        Raises:
+            NoResultsFoundError: Jika tidak ada link ditemukan
         """
-        logger.info("📜 Memulai scrolling untuk mengumpulkan link...")
+        logger.info(f"📜 {const.INFO_SCROLLING_START}")
         
-        scrollable_div = self.wait.until(
-            EC.presence_of_element_located((By.XPATH, ScraperConfig.SELECTORS['feed']))
-        )
-        
-        # Scroll dengan helper function
-        reached_end = scroll_element(
-            self.driver, 
-            scrollable_div, 
-            max_scrolls,
-            ScraperConfig.SCROLL_PAUSE_TIME
-        )
-        
-        if not reached_end:
-            logger.info(f"⚠️  Scroll selesai tanpa mencapai akhir daftar (max: {max_scrolls})")
-        
-        # Kumpulkan links
-        logger.info("🔗 Mengumpulkan link hasil...")
-        result_links = self.driver.find_elements(
-            By.CSS_SELECTOR, 
-            ScraperConfig.SELECTORS['result_links']
-        )
-        
-        links = [
-            link.get_attribute('href') 
-            for link in result_links 
-            if link.get_attribute('href')
-        ]
-        
-        # Deduplicate sambil preserve order
-        unique_links = list(dict.fromkeys(links))
-        logger.info(f"✅ Total {len(unique_links)} link unik ditemukan")
-        
-        return unique_links
+        try:
+            # Find scrollable div
+            scrollable_div = self.wait.until(
+                EC.presence_of_element_located(
+                    (By.XPATH, ScraperConfig.SELECTORS[const.SELECTOR_ID_FEED])
+                )
+            )
+            
+            # Scroll dengan helper function
+            reached_end = scroll_element(
+                self.driver,
+                scrollable_div,
+                max_scrolls,
+                ScraperConfig.SCROLL_PAUSE_TIME
+            )
+            
+            if not reached_end:
+                logger.info(
+                    f"⚠️  Scroll selesai tanpa mencapai akhir daftar "
+                    f"(max: {max_scrolls})"
+                )
+            
+            # Collect links
+            logger.info(f"🔗 {const.INFO_COLLECTING_LINKS}")
+            result_links = self.driver.find_elements(
+                By.CSS_SELECTOR,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_RESULT_LINKS]
+            )
+            
+            # Extract URLs
+            links = [
+                link.get_attribute('href')
+                for link in result_links
+                if link.get_attribute('href')
+            ]
+            
+            # Deduplicate sambil preserve order
+            unique_links = list(dict.fromkeys(links))
+            
+            if not unique_links:
+                raise NoResultsFoundError()
+            
+            logger.info(f"✅ Total {len(unique_links)} link unik ditemukan")
+            return unique_links
+            
+        except NoResultsFoundError:
+            raise
+        except Exception as e:
+            logger.error(f"Error collecting links: {e}")
+            raise
     
     def scrape_detail_page(self, url: str) -> Dict[str, str]:
         """
-        Scrape detail dari satu halaman bisnis
+        Scrape detail dari satu halaman bisnis.
+        
+        Data yang di-extract:
+        - Nama bisnis
+        - Alamat lengkap
+        - Kota (extracted dari alamat)
+        - Nomor telepon
+        - Deskripsi/kategori
+        - Website URL
+        - Logo/image URL
+        - Email (dari website jika ada)
+        - Google Maps URL
         
         Args:
-            url: URL halaman detail
+            url: URL halaman detail bisnis
         
         Returns:
             Dictionary berisi data yang di-scrape
         """
         data = {
-            'namaTravel': '',
-            'alamat': '',
-            'kota': '',
-            'telepon': '',
-            'deskripsi': '',
-            'websiteUrl': '',
-            'logoUrl': '',
-            'email': '',
-            'mapUrl': url
+            const.CSV_HEADER_NAMA: '',
+            const.CSV_HEADER_ALAMAT: '',
+            const.CSV_HEADER_KOTA: '',
+            const.CSV_HEADER_TELEPON: '',
+            const.CSV_HEADER_DESKRIPSI: '',
+            const.CSV_HEADER_WEBSITE: '',
+            const.CSV_HEADER_LOGO: '',
+            const.CSV_HEADER_EMAIL: '',
+            const.CSV_HEADER_MAP_URL: url
         }
         
         try:
             self.driver.get(url)
             time.sleep(ScraperConfig.DETAIL_PAGE_DELAY)
             
-            # Scrape dengan helper function
-            data['namaTravel'] = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['name']
+            # Nama bisnis
+            data[const.CSV_HEADER_NAMA] = safe_find_element(
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_NAME]
             )
             
             # Alamat
             address_raw = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['address'],
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_ADDRESS],
                 attribute='aria-label'
             )
             if address_raw and ':' in address_raw:
-                data['alamat'] = address_raw.split(':', 1)[1].strip()
+                data[const.CSV_HEADER_ALAMAT] = address_raw.split(':', 1)[1].strip()
             
             # Kota (extract dari alamat)
-            if data['alamat']:
-                data['kota'] = extract_city_from_address(data['alamat'])
+            if data[const.CSV_HEADER_ALAMAT]:
+                data[const.CSV_HEADER_KOTA] = extract_city_from_address(
+                    data[const.CSV_HEADER_ALAMAT]
+                )
             
             # Telepon
             phone_raw = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['phone'],
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_PHONE],
                 attribute='aria-label'
             )
             if phone_raw and ':' in phone_raw:
-                data['telepon'] = format_phone_number(phone_raw.split(':', 1)[1])
+                data[const.CSV_HEADER_TELEPON] = format_phone_number(
+                    phone_raw.split(':', 1)[1]
+                )
             
-            # Kategori/Deskripsi - coba multiple selectors
-            data['deskripsi'] = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['category']
+            # Deskripsi/Kategori
+            data[const.CSV_HEADER_DESKRIPSI] = safe_find_element(
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_CATEGORY]
             )
             
             # Website URL
-            data['websiteUrl'] = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['website'],
+            data[const.CSV_HEADER_WEBSITE] = safe_find_element(
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_WEBSITE],
                 attribute='href'
             )
             
             # Logo/Image
-            data['logoUrl'] = safe_find_element(
-                self.driver, By.XPATH, ScraperConfig.SELECTORS['logo'],
+            data[const.CSV_HEADER_LOGO] = safe_find_element(
+                self.driver,
+                By.XPATH,
+                ScraperConfig.SELECTORS[const.SELECTOR_ID_LOGO],
                 attribute='src'
             )
             
             # Email (hanya jika ada website)
-            if data['websiteUrl'] and self.email_finder:
-                data['email'] = self.email_finder.find_email_on_website(data['websiteUrl'])
+            if data[const.CSV_HEADER_WEBSITE] and self.email_finder:
+                try:
+                    data[const.CSV_HEADER_EMAIL] = self.email_finder.find_email_on_website(
+                        data[const.CSV_HEADER_WEBSITE]
+                    )
+                except Exception as e:
+                    logger.debug(f"   Email extraction error: {e}")
             
         except Exception as e:
             logger.warning(f"⚠️  Error scraping {url}: {str(e)[:100]}")
         
         return data
     
-    def scrape_all(self, links: List[str], output_file: str) -> Tuple[int, DataStatistics]:
+    def scrape_all(
+        self,
+        links: List[str],
+        output_file: str
+    ) -> Tuple[int, DataStatistics]:
         """
-        Scrape semua links dan simpan ke CSV (dengan validation)
+        Scrape semua links dan simpan ke CSV dengan validation.
+        
+        Process:
+        1. Open CSV file untuk writing
+        2. Iterate semua links
+        3. Scrape detail dari setiap link
+        4. Truncate long fields
+        5. Validate data berdasarkan mode
+        6. Save jika valid, skip jika tidak
+        7. Track statistics
         
         Args:
             links: List of URLs untuk di-scrape
             output_file: Path file output CSV
         
         Returns:
-            Tuple (success_count, statistics)
+            Tuple (success_count: int, statistics: DataStatistics)
         """
         logger.info(f"💾 Membuka file output: {output_file}")
         logger.info(f"🔍 Validation Mode: {ScraperConfig.VALIDATION_MODE}")
@@ -394,7 +590,7 @@ class GoogleMapsScraper:
         if required:
             logger.info(f"📋 Required Fields: {', '.join(required)}")
         else:
-            logger.info(f"📋 No validation - semua data akan disimpan")
+            logger.info("📋 No validation - semua data akan disimpan")
         
         stats = DataStatistics()
         tracker = ProgressTracker(len(links), "Scraping Progress")
@@ -424,34 +620,54 @@ class GoogleMapsScraper:
                     stats.add_saved()
                     
                     # Log progress
-                    email_status = f"✉️ {data['email'][:30]}" if data['email'] else "❌"
-                    name_display = data['namaTravel'][:35] if data['namaTravel'] else "No name"
+                    email_status = (
+                        f"✉️ {data[const.CSV_HEADER_EMAIL][:30]}"
+                        if data[const.CSV_HEADER_EMAIL]
+                        else "❌"
+                    )
+                    name_display = (
+                        data[const.CSV_HEADER_NAMA][:35]
+                        if data[const.CSV_HEADER_NAMA]
+                        else "No name"
+                    )
                     tracker.update(1, f"✅ {name_display} | {email_status}")
                     
-                    # Flush every 10 rows
-                    if stats.total_saved % 10 == 0:
+                    # Flush periodically untuk prevent data loss
+                    if stats.total_saved % ScraperConfig.FLUSH_INTERVAL == 0:
                         f.flush()
                 else:
                     # Skip data
                     stats.add_skipped(reason)
                     
                     # Log skip
-                    name_display = data['namaTravel'][:35] if data['namaTravel'] else "No name"
+                    name_display = (
+                        data[const.CSV_HEADER_NAMA][:35]
+                        if data[const.CSV_HEADER_NAMA]
+                        else "No name"
+                    )
                     logger.warning(f"   ⏭️  SKIP: {name_display} - {reason}")
         
-        tracker.complete(f"Processing selesai")
+        tracker.complete("Processing selesai")
         return stats.total_saved, stats
     
     def run(self, query: str, max_scrolls: int) -> Tuple[str, int, DataStatistics]:
         """
-        Main method untuk menjalankan scraper
+        Main method untuk menjalankan scraper end-to-end.
+        
+        Workflow:
+        1. Setup WebDriver
+        2. Search di Google Maps
+        3. Collect links dari hasil
+        4. Scrape detail + email
+        5. Save ke CSV
+        6. Return statistics
         
         Args:
             query: Search query
             max_scrolls: Maksimal scroll
         
         Returns:
-            Tuple (output_filename, success_count, statistics)
+            Tuple (output_filename: str, success_count: int, statistics: DataStatistics)
         """
         stats = DataStatistics()
         
@@ -461,7 +677,7 @@ class GoogleMapsScraper:
             links = self.collect_links(max_scrolls)
             
             if not links:
-                logger.error("❌ Tidak ada link ditemukan. Proses berhenti.")
+                logger.error(const.ERROR_NO_LINKS_FOUND)
                 return "", 0, stats
             
             # Generate output filename
@@ -478,100 +694,128 @@ class GoogleMapsScraper:
         except Exception as e:
             logger.error(f"❌ Error fatal: {e}", exc_info=True)
             return "", 0, stats
+            
         finally:
             self.cleanup()
     
     def cleanup(self) -> None:
-        """Cleanup resources"""
+        """
+        Cleanup resources: close browser, tabs, etc.
+        Akan dipanggil di finally block untuk ensure cleanup.
+        """
         if self.driver:
             try:
                 close_extra_tabs(self.driver)
                 self.driver.quit()
-                logger.info("✨ Browser ditutup, cleanup selesai")
+                logger.info(f"✨ {const.SUCCESS_CLEANUP}")
             except Exception as e:
                 logger.warning(f"Warning saat cleanup: {e}")
 
 
 def main():
-    """Main entry point"""
+    """
+    Main entry point untuk CLI application.
+    Handles user input dan orchestrate scraping process.
+    """
     print("=" * 70)
-    print("🗺️  GOOGLE MAPS LEAD SCRAPER - IMPROVED VERSION v18")
+    print(f"🗺️  {const.APP_NAME.upper()} - VERSION {const.APP_VERSION}")
     print("=" * 70)
     print()
     
-    # User input
-    search_query = input("📍 Masukkan kata kunci pencarian (contoh: 'travel agent di Jakarta'): ").strip()
+    # ========================================================================
+    # User Input: Search Query
+    # ========================================================================
+    search_query = input(
+        "📍 Masukkan kata kunci pencarian "
+        "(contoh: 'travel agent di Jakarta'): "
+    ).strip()
     
     if not search_query:
-        print("❌ Query pencarian tidak boleh kosong!")
+        print(f"❌ {const.ERROR_EMPTY_QUERY}")
         return
     
-    # Max scrolls input
+    # ========================================================================
+    # User Input: Max Scrolls
+    # ========================================================================
     while True:
         try:
-            max_scrolls_str = input(f"📜 Maksimal scroll (default: {ScraperConfig.DEFAULT_MAX_SCROLLS}, Enter = default): ").strip()
+            max_scrolls_str = input(
+                f"📜 Maksimal scroll "
+                f"(default: {ScraperConfig.DEFAULT_MAX_SCROLLS}, Enter = default): "
+            ).strip()
+            
             if not max_scrolls_str:
                 max_scrolls = ScraperConfig.DEFAULT_MAX_SCROLLS
                 break
+            
             max_scrolls = int(max_scrolls_str)
             if max_scrolls < 1:
-                print("⚠️  Minimal scroll adalah 1")
+                print(f"⚠️  {const.ERROR_INVALID_SCROLL}")
                 continue
             break
+            
         except ValueError:
-            print("❌ Input tidak valid, masukkan angka!")
+            print(f"❌ {const.ERROR_INVALID_INPUT}")
     
-    # Validation mode selection
+    # ========================================================================
+    # User Input: Validation Mode
+    # ========================================================================
     print()
     print("🔍 Pilih Data Validation Mode:")
-    print("   1. STRICT   - Semua field wajib terisi (~10-20% data tersimpan)")
-    print("   2. MODERATE - Minimal: nama, website, email (~20-30% data tersimpan) [RECOMMENDED]")
-    print("   3. LENIENT  - Minimal: nama, telepon (~80-90% data tersimpan)")
-    print("   4. NONE     - Simpan semua data tanpa filter (~100% data tersimpan)")
+    
+    mode_info = ScraperConfig.get_validation_modes_info()
+    for i, (mode, desc) in enumerate(mode_info.items(), 1):
+        recommended = " [RECOMMENDED]" if mode == const.VALIDATION_MODE_MODERATE else ""
+        print(f"   {i}. {mode:<10} - {desc}{recommended}")
     
     while True:
-        mode_input = input(f"Pilih mode (1-4, default: 2): ").strip()
-        if not mode_input:
-            ScraperConfig.VALIDATION_MODE = 'MODERATE'
+        mode_input = input("Pilih mode (1-4, default: 2): ").strip()
+        
+        if not mode_input or mode_input == '2':
+            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_MODERATE
             break
-        if mode_input == '1':
-            ScraperConfig.VALIDATION_MODE = 'STRICT'
-            break
-        elif mode_input == '2':
-            ScraperConfig.VALIDATION_MODE = 'MODERATE'
+        elif mode_input == '1':
+            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_STRICT
             break
         elif mode_input == '3':
-            ScraperConfig.VALIDATION_MODE = 'LENIENT'
+            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_LENIENT
             break
         elif mode_input == '4':
-            ScraperConfig.VALIDATION_MODE = 'NONE'
+            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_NONE
             break
         else:
             print("❌ Pilihan tidak valid!")
     
     print(f"✅ Mode dipilih: {ScraperConfig.VALIDATION_MODE}")
     
-    # Headless option
-    headless_input = input("🔇 Jalankan headless mode? (y/n, default: n): ").strip().lower()
+    # ========================================================================
+    # User Input: Headless Mode
+    # ========================================================================
+    headless_input = input(
+        "🔇 Jalankan headless mode? (y/n, default: n): "
+    ).strip().lower()
     headless = headless_input == 'y'
     
+    # ========================================================================
+    # Run Scraper
+    # ========================================================================
     print()
     print("🚀 Memulai scraping...")
     print("=" * 70)
     print()
     
-    # Run scraper
     scraper = GoogleMapsScraper(headless=headless)
     output_file, success_count, stats = scraper.run(search_query, max_scrolls)
     
-    # Final report
+    # ========================================================================
+    # Final Report
+    # ========================================================================
     print()
     print("=" * 70)
     if output_file and success_count > 0:
-        print(f"🎉 SELESAI! Data berhasil disimpan:")
+        print("🎉 SELESAI! Data berhasil disimpan:")
         print(f"   📁 File: {output_file}")
         print()
-        # Show detailed statistics
         print(stats.get_summary())
     else:
         print("❌ Scraping gagal atau tidak ada data.")
