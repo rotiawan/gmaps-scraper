@@ -338,9 +338,3 @@ Project ini dibuat untuk keperluan edukasi dan bisnis development. Gunakan denga
 ---
 
 <div align="center">
-
-**⭐ Jika project ini membantu, berikan star di GitHub! ⭐**
-
-Made with ❤️ for Business Development Teams
-
-</div>
