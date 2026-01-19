@@ -1150,7 +1150,16 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-[... full MIT license text ...]
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 **Disclaimer:**
@@ -1196,7 +1205,6 @@ for query in queries:
 1. **Dokumentasi**: Baca README ini dengan teliti
 2. **Log File**: Check `scraper.log` untuk error details
 3. **GitHub Issues**: [Report bugs atau request features](https://github.com/rotiawan/gmaps-scraper/issues)
-4. **Email**: your.email@example.com (update dengan email asli)
 
 ### Changelog
 
@@ -1221,10 +1229,6 @@ for query in queries:
 ---
 
 <div align="center">
-
-### ⭐ Jika project ini membantu, berikan star di GitHub! ⭐
-
-**Built with ❤️ for Business Development Teams**
 
 [⬆ Back to Top](#-google-maps-lead-scraper)
 
