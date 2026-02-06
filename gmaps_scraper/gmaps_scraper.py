@@ -741,106 +741,121 @@ class GoogleMapsScraper:
                 logger.warning(f"Warning saat cleanup: {e}")
 
 
-def main():
+# ===========================================================================
+# CLI Input Handlers
+# ===========================================================================
+
+
+def get_search_query_input() -> str:
     """
-    Main entry point untuk CLI application.
-    Handles user input dan orchestrate scraping process.
+    Prompt user untuk memasukkan search query.
+
+    Returns:
+        Search query string, atau empty string jika tidak valid
     """
-    print("=" * 70)
-    print(f"🗺️  {const.APP_NAME.upper()} - VERSION {const.APP_VERSION}")
-    print("=" * 70)
-    print()
-    
-    # ========================================================================
-    # User Input: Search Query
-    # ========================================================================
-    search_query = input(
+    query = input(
         "📍 Masukkan kata kunci pencarian "
         "(contoh: 'travel agent di Jakarta'): "
     ).strip()
-    
-    if not search_query:
+
+    if not query:
         print(f"❌ {const.ERROR_EMPTY_QUERY}")
-        return
-    
-    # ========================================================================
-    # User Input: Max Scrolls
-    # ========================================================================
+        return ""
+
+    return query
+
+
+def get_max_scrolls_input() -> int:
+    """
+    Prompt user untuk memasukkan jumlah maksimal scroll.
+
+    Returns:
+        Jumlah scroll (integer)
+    """
     while True:
         try:
-            max_scrolls_str = input(
+            user_input = input(
                 f"📜 Maksimal scroll "
                 f"(default: {ScraperConfig.DEFAULT_MAX_SCROLLS}, Enter = default): "
             ).strip()
-            
-            if not max_scrolls_str:
-                max_scrolls = ScraperConfig.DEFAULT_MAX_SCROLLS
-                break
-            
-            max_scrolls = int(max_scrolls_str)
+
+            if not user_input:
+                return ScraperConfig.DEFAULT_MAX_SCROLLS
+
+            max_scrolls = int(user_input)
             if max_scrolls < 1:
                 print(f"⚠️  {const.ERROR_INVALID_SCROLL}")
                 continue
-            break
-            
+
+            return max_scrolls
+
         except ValueError:
             print(f"❌ {const.ERROR_INVALID_INPUT}")
-    
-    # ========================================================================
-    # User Input: Validation Mode
-    # ========================================================================
+
+
+def get_validation_mode_input() -> str:
+    """
+    Prompt user untuk memilih validation mode.
+
+    Returns:
+        Validation mode string (STRICT, MODERATE, LENIENT, atau NONE)
+    """
     print()
     print("🔍 Pilih Data Validation Mode:")
-    
+
     mode_info = ScraperConfig.get_validation_modes_info()
     for i, (mode, desc) in enumerate(mode_info.items(), 1):
-        recommended = " [RECOMMENDED]" if mode == const.VALIDATION_MODE_MODERATE else ""
-        print(f"   {i}. {mode:<10} - {desc}{recommended}")
-    
+        suffix = " [RECOMMENDED]" if mode == const.VALIDATION_MODE_MODERATE else ""
+        print(f"   {i}. {mode:<10} - {desc}{suffix}")
+
+    mode_mapping = {
+        '1': const.VALIDATION_MODE_STRICT,
+        '2': const.VALIDATION_MODE_MODERATE,
+        '3': const.VALIDATION_MODE_LENIENT,
+        '4': const.VALIDATION_MODE_NONE,
+    }
+
     while True:
-        mode_input = input("Pilih mode (1-4, default: 2): ").strip()
-        
-        if not mode_input or mode_input == '2':
-            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_MODERATE
-            break
-        elif mode_input == '1':
-            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_STRICT
-            break
-        elif mode_input == '3':
-            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_LENIENT
-            break
-        elif mode_input == '4':
-            ScraperConfig.VALIDATION_MODE = const.VALIDATION_MODE_NONE
-            break
-        else:
-            print("❌ Pilihan tidak valid!")
-    
-    print(f"✅ Mode dipilih: {ScraperConfig.VALIDATION_MODE}")
-    
-    # ========================================================================
-    # User Input: Headless Mode
-    # ========================================================================
-    headless_input = input(
+        user_input = input("Pilih mode (1-4, default: 2): ").strip()
+
+        if not user_input:
+            return const.VALIDATION_MODE_MODERATE
+
+        if user_input in mode_mapping:
+            return mode_mapping[user_input]
+
+        print("❌ Pilihan tidak valid!")
+
+
+def get_headless_mode_input() -> bool:
+    """
+    Prompt user untuk memilih headless mode.
+
+    Returns:
+        True jika headless mode dipilih, False jika tidak
+    """
+    user_input = input(
         "🔇 Jalankan headless mode? (y/n, default: n): "
     ).strip().lower()
-    headless = headless_input == 'y'
-    
-    # ========================================================================
-    # Run Scraper
-    # ========================================================================
+    return user_input == 'y'
+
+
+def print_final_report(
+    output_file: str,
+    success_count: int,
+    stats: DataStatistics
+) -> None:
+    """
+    Print laporan akhir hasil scraping.
+
+    Args:
+        output_file: Path ke file output CSV
+        success_count: Jumlah data yang berhasil disimpan
+        stats: Object DataStatistics dengan statistik lengkap
+    """
     print()
-    print("🚀 Memulai scraping...")
     print("=" * 70)
-    print()
-    
-    scraper = GoogleMapsScraper(headless=headless)
-    output_file, success_count, stats = scraper.run(search_query, max_scrolls)
-    
-    # ========================================================================
-    # Final Report
-    # ========================================================================
-    print()
-    print("=" * 70)
+
     if output_file and success_count > 0:
         print("🎉 SELESAI! Data berhasil disimpan:")
         print(f"   📁 File: {output_file}")
@@ -851,7 +866,49 @@ def main():
         if stats.total_processed > 0:
             print()
             print(stats.get_summary())
+
     print("=" * 70)
+
+
+# ===========================================================================
+# Main Entry Point
+# ===========================================================================
+
+
+def main():
+    """
+    Main entry point untuk CLI application.
+    Orchestrates user input collection dan scraping process.
+    """
+    print("=" * 70)
+    print(f"🗺️  {const.APP_NAME.upper()} - VERSION {const.APP_VERSION}")
+    print("=" * 70)
+    print()
+
+    # Collect user inputs
+    search_query = get_search_query_input()
+    if not search_query:
+        return
+
+    max_scrolls = get_max_scrolls_input()
+
+    validation_mode = get_validation_mode_input()
+    ScraperConfig.VALIDATION_MODE = validation_mode
+    print(f"✅ Mode dipilih: {validation_mode}")
+
+    headless = get_headless_mode_input()
+
+    # Run scraper
+    print()
+    print("🚀 Memulai scraping...")
+    print("=" * 70)
+    print()
+
+    scraper = GoogleMapsScraper(headless=headless)
+    output_file, success_count, stats = scraper.run(search_query, max_scrolls)
+
+    # Print final report
+    print_final_report(output_file, success_count, stats)
 
 
 if __name__ == "__main__":

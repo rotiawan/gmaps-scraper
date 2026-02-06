@@ -134,7 +134,10 @@ def handle_scraper_exception(default_return=None, log_error=True):
             # ... code that might raise exception
             pass
     """
+    from functools import wraps
+    
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -148,8 +151,12 @@ def handle_scraper_exception(default_return=None, log_error=True):
                 if log_error:
                     import logging
                     logger = logging.getLogger(func.__module__)
-                    logger.error(f"Unexpected error in {func.__name__}: {e}", exc_info=True)
+                    logger.error(
+                        f"Unexpected error in {func.__name__}: {e}",
+                        exc_info=True
+                    )
                 return default_return
         return wrapper
     return decorator
+
 
